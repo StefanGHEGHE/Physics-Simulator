@@ -107,11 +107,20 @@ int main() {
     GLFWmonitor *primaryMonitor = (monitors && monitor_count > 1) ? monitors[1] : NULL;
     GLFWmonitor *secondaryMonitor = monitors ? monitors[0] : NULL;
 
-	Particle vertices[] = {
-        {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}}, // Bottom Left
-        {{ 0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}}, // Bottom Right
-        {{ 0.0f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}}  // Top Center
-    };
+	float vertices1[] = {
+		-0.5f, -0.5f, 0.0f, // top right
+		-0.25f, -0.5f, 0.0f, // bottom right
+		-0.0f, -0.0f, 0.0f, // top middle
+	};
+	float vertices2[] = {
+		0.5f, 0.5f, 0.0f, // top right
+		0.25f, 0.5f, 0.0f, // bottom right
+		0.0f, 0.0f, 0.0f, // bottom middle
+	};
+	unsigned int indices[] = { // note that we start from 0!
+		0, 1, 2, // first triangle
+		2, 3, 4 // second triangle
+	};
 
     GLFWwindow* window = glfwCreateWindow(800, 600, "Physics Engine", NULL, NULL);
     if (!window) {
@@ -138,18 +147,20 @@ int main() {
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	GLuint VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)0);
-    glEnableVertexAttribArray(0);
+	GLuint VBO[2], VAO[2];
+	glGenVertexArrays(2, VAO);
+	glGenBuffers(2, VBO);
+	glBindVertexArray(VAO[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
-	glBindVertexArray(0);
+	glBindVertexArray(VAO[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -157,7 +168,11 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glBindVertexArray(VAO);
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO[0]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		glBindVertexArray(VAO[1]);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
