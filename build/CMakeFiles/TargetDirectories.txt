@@ -1,3 +1,0 @@
-/home/dandiaconescu/Desktop/heiii/physics_engine/build/CMakeFiles/exec.dir
-/home/dandiaconescu/Desktop/heiii/physics_engine/build/CMakeFiles/edit_cache.dir
-/home/dandiaconescu/Desktop/heiii/physics_engine/build/CMakeFiles/rebuild_cache.dir
